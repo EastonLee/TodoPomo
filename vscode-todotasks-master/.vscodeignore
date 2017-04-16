@@ -1,0 +1,10 @@
+.vscode/**
+typings/**
+out/test/**
+test/**
+src/**
+resources/**
+**/*.map
+.gitignore
+tsconfig.json
+todotasks-project.tasks
