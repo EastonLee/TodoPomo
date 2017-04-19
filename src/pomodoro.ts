@@ -4,16 +4,21 @@ import { TimeUnits, Timer } from './timer';
 import { getConfig } from './config';
 import { YesNoPrompt, InputPrompt, StatusBar } from './ui';
 import { TaskStorage } from './storage';
-
+import {TextDocument, TextLine, Position, CompletionItem, Range} from 'vscode';
+import {TextEditor, TextEditorEdit} from 'vscode';
+import {TodoDocument} from './TodoDocument'
 
 export class Pomodoro {
 	private static _instance: Pomodoro;
+	private static _textEditor: TextEditor;
+	private static _edit: TextEditorEdit;
 
 	private _statusBars: StatusBar = StatusBar.getInstance();
 
 	private _storage: TaskStorage;
 
 	public tasks: Task[];
+	public task: Task;
 	public completedTasksCounter: number;
 	public currentTaskIndex: number;
 
@@ -21,16 +26,18 @@ export class Pomodoro {
 
 	private _timer: Timer;
 
-	private constructor() {
+	private constructor(private textEditor: TextEditor, private edit: TextEditorEdit) {
 		this.tasks = [] as Task[];
 		this.completedTasksCounter = 0;
 		this.breakCounter = 0;
 		this._storage = new TaskStorage(getConfig().tasks_file);
 	}
 
-	public static getInstance(): Pomodoro {		
-		if (Pomodoro._instance === null || Pomodoro._instance === undefined) {
-			Pomodoro._instance =  new Pomodoro();
+	public static getInstance(textEditor?: TextEditor, edit?: TextEditorEdit): Pomodoro {	
+		// easton: only todopomo.start command need textEditor	
+		if (Pomodoro._instance === null || Pomodoro._instance === undefined || 
+				Pomodoro._textEditor === null || Pomodoro._textEditor === undefined) {
+			Pomodoro._instance =  new Pomodoro(textEditor, edit);
 		}
 		return Pomodoro._instance;
 	}
@@ -68,16 +75,12 @@ export class Pomodoro {
 
 	public start() {
 		const pomodoro = Pomodoro.getInstance();
-		pomodoro.pickTask();
-		console.log(pomodoro.tasks);
-		console.log(pomodoro.currentTaskIndex);
-		if (pomodoro.currentTaskIndex < pomodoro.tasks.length) {
-			pomodoro._statusBars.updateCurrentTask(`Focus: `+pomodoro.tasks[pomodoro.currentTaskIndex].name)
-		
-			pomodoro._timer = pomodoro.tasks[pomodoro.currentTaskIndex].startTask(pomodoro.askAboutTaskCompletion);
-			pomodoro._storage.save();	
-		} else {
-			return;
+		let task = new TodoDocument(this.textEditor.document).getTaskPlusProjects(this.textEditor.selection.start);
+		if (task){
+			pomodoro._statusBars.updateCurrentTask(`Focus: `+task.getTask());
+			pomodoro.task = new Task(task.getTask(), null);
+			pomodoro._timer = pomodoro.task.startTask(()=>{});
+			pomodoro._storage.save();
 		}
 	}
 

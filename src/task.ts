@@ -12,10 +12,6 @@ export class Task {
     this.isCompleted = _isCompleted;
   }
 
-  public CompleteTask() {
-    this.isCompleted = true;
-  }
-
   public updateTaskName(newName: string) {
     this.name = newName;
   }

@@ -28,6 +28,6 @@ export function getConfig(): Config {
       break_duration: configuration.break_duration * TimeUnits.Minute || DEFAULT_BREAK_DURATION,
       long_break_duration: configuration.long_break_duration * TimeUnits.Minute || DEFAULT_LONG_BREAK_DURATION,
       counter_to_long_break: configuration.counter_to_long_break || COUNTER_TO_LONG_BREAK, 
-      tasks_file: configuration.task_file || path.join(__dirname, `../../tasks.json`)
+      tasks_file: configuration.task_file || path.join(__dirname, `../../todopomo.json`)
     } as Config;
 }

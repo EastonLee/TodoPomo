@@ -30,6 +30,27 @@ export class TodoDocument {
         return null;
     }
 
+    public getParentProject(cur_line_num: number): Array<string> {
+        let line= this._textDocument.lineAt(cur_line_num)
+        let parentProjects = [];
+        let line_num = line.lineNumber;
+        let rev_prev_line_nums = [];
+        for (let i=line_num-1 ; i>=0; i--){
+            rev_prev_line_nums.push(i);
+        }
+        let lines = rev_prev_line_nums.map(this._textDocument.lineAt);
+        let min_indent = Number.MAX_SAFE_INTEGER;
+        lines.forEach((l: TextLine)=>{
+            let cur_indent = l.firstNonWhitespaceCharacterIndex;
+            if (cur_indent < min_indent){
+                min_indent = cur_indent;
+                parentProjects.push(l.text.trim());
+            }
+        });
+        console.log(parentProjects);
+        return parentProjects;
+    }
+
     public getTasks(): Task[] {
         let result: Task[]= [];
         var text= this._textDocument.getText();
@@ -42,13 +63,15 @@ export class TodoDocument {
         return result;
     }
 
-    public getTask(pos: Position): Task {
+    public getTaskPlusProjects(pos: Position): TaskPlusProject {
         if (!this.isTask(pos)) {
             return null;
         }
 
         let line= this._textDocument.lineAt(pos.line);
-        return new Task(line);
+        let line_plus_project = this.getParentProject(line.lineNumber);
+        let line_plus_project_str = line_plus_project.join(' ') + line.text.trim().replace('☐', '');
+        return new TaskPlusProject(line_plus_project_str);
     }
 
     public isTask(pos: Position): boolean {
@@ -144,6 +167,14 @@ export class Task {
             }
         }
         return result;
+    }
+}
+
+class TaskPlusProject{
+    constructor(private task: string){
+    };
+    public getTask(){
+        return this.task;
     }
 }
 
