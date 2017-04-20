@@ -30,13 +30,10 @@ export class TaskStorage {
 
     try {
       let items = JSON.parse(fs.readFileSync(this.filename).toString());
-
       tasks = items.map(t => {
         return new Task(t.name, t.startTime, t.isCompleted)
       });
-      
       this._pomodoro.tasks = tasks;
-
     } catch (error) {
       console.log(error);
     }

@@ -3,6 +3,7 @@ const SECONDS_IN_MINUTE: number = 60;
 const MILLISECONDS_IN_SECOND : number = 1000;
 
 import { StatusBar } from './ui';
+import {Sound} from './sounds';
 
 export enum TimeUnits {
   Milliseconds = 1,
@@ -25,12 +26,13 @@ export class Timer {
 
   }
 
-  public start (next: Function) {
+  public start (next: Function, soundFile?: string) {
     const statusBars = StatusBar.getInstance();
     if (!this.isRunning){
       this.isRunning = true;
       this._timer = setInterval(()=> {
         this.tick();
+        if (soundFile) Sound.play(soundFile);
         statusBars.updateTimerBar(this.countdownMilliseconds);
         if(this.countdownMilliseconds <= 0) {
           this.stop()

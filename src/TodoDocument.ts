@@ -45,6 +45,7 @@ export class TodoDocument {
         let lines = rev_prev_line_nums.map(this._textDocument.lineAt);
         let min_indent = line.firstNonWhitespaceCharacterIndex;
         lines.forEach((l: TextLine)=>{
+            if (l.text.trim() === "") return;
             let cur_indent = l.firstNonWhitespaceCharacterIndex;
             if (cur_indent < min_indent){
                 min_indent = cur_indent;

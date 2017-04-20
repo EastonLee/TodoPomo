@@ -17,7 +17,7 @@ export class Task {
     this.name = newName;
   }
 
-  public startTask(next: Function) : Timer {
+  public startTask(next: Function, soundFile?: string) : Timer {
     let duration = getConfig().task_duration;
     if (this.startTime !== null){ // if the task not already started
       let difference = new Date().getTime() - new Date(this.startTime).getTime();
@@ -27,10 +27,11 @@ export class Task {
     }
 
     let _timer = new Timer(duration, TimeUnits.Milliseconds);
-    _timer.start(next);
+    _timer.start(next, soundFile);
     
     return _timer;
   }
+  
   public static getTodayTasksCounter(){
     const pomodoro = Pomodoro.getInstance();
     return pomodoro.tasks.filter((t)=>{

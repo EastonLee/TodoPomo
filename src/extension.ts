@@ -10,8 +10,6 @@ export function activate(context: vscode.ExtensionContext) {
 	statusBars.updateTasksCounter(pomodoro.todayTasksCounter);
     let disposable = vscode.commands.registerTextEditorCommand('todopomo.start', pomodoro.start);
     context.subscriptions.push(disposable);
-    // disposable = vscode.commands.registerCommand(`todopomo.pause`, () => pomodoro.pause());	
-    // context.subscriptions.push(disposable);
     disposable = vscode.commands.registerCommand(`todopomo.stop`, pomodoro.stop);	
     context.subscriptions.push(disposable);
     disposable = vscode.commands.registerCommand(`todopomo.startOrStop`, pomodoro.toggle);	
