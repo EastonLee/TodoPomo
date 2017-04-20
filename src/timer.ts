@@ -11,8 +11,11 @@ export enum TimeUnits {
   Hour = MINUTES_IN_HOUR * SECONDS_IN_MINUTE * MILLISECONDS_IN_SECOND
 };
 
+export enum TimerType{task, break};
+
 export class Timer {
   public countdownMilliseconds: number;
+  public type: TimerType;
   private isRunning: boolean;
   private _timer: NodeJS.Timer;
 

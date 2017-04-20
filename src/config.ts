@@ -20,7 +20,7 @@ export interface Config {
 export function getConfig(): Config {
     let configuration;
     try {
-        configuration = workspace.getConfiguration('pomodoro');
+        configuration = workspace.getConfiguration('todopomo');
     } catch (error) {}    
     
     return {
@@ -28,6 +28,8 @@ export function getConfig(): Config {
       break_duration: configuration.break_duration * TimeUnits.Minute || DEFAULT_BREAK_DURATION,
       long_break_duration: configuration.long_break_duration * TimeUnits.Minute || DEFAULT_LONG_BREAK_DURATION,
       counter_to_long_break: configuration.counter_to_long_break || COUNTER_TO_LONG_BREAK, 
+      // TODO
+      todo_file: configuration.todo_file || path.join(__dirname, `~/.everything.todo`),
       tasks_file: configuration.task_file || path.join(__dirname, `../../todopomo.json`)
     } as Config;
 }

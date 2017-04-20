@@ -1,4 +1,6 @@
 import * as vscode from 'vscode';
+import {Pomodoro} from './pomodoro'
+import {TimerType} from './timer'
 
 export class StatusBar {
   private static _instance: StatusBar;
@@ -14,13 +16,13 @@ export class StatusBar {
     StatusBar.taskStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 1);
     StatusBar.startStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 4);
 
-    StatusBar.timerStatusBar.text = `$(watch) 00:00`;
-    StatusBar.taskStatusBar.text = `nothing is currently running`;
-    StatusBar.tasksCounterStatusBar.text = `(0/0)`;
+    StatusBar.timerStatusBar.text = `00:00`;
+    StatusBar.taskStatusBar.text = `Stop`;
+    StatusBar.tasksCounterStatusBar.text = `[0]`;
     StatusBar.startStatusBar.text = `$(triangle-right)`;
     StatusBar.startStatusBar.color = 'lightgreen';
     StatusBar.startStatusBar.tooltip = 'start';
-    StatusBar.startStatusBar.command = 'todopomo.start';
+    StatusBar.startStatusBar.command = 'todopomo.startOrStop';
 
     StatusBar.timerStatusBar.show();
     StatusBar.tasksCounterStatusBar.show();
@@ -36,30 +38,52 @@ export class StatusBar {
     return StatusBar._instance;
   }
 
-  public updateTasksCounter(completedTasks: number = 0, totalTasks: number) {
-    StatusBar.tasksCounterStatusBar.text = `(${completedTasks}/${totalTasks})`
+  public updateStartBar() {
+    const pomodoro = Pomodoro.getInstance();
+    console.log(Pomodoro);
+    console.log(pomodoro.timer);
+    if (pomodoro.timer && pomodoro.timer.type === TimerType.task) {
+      StatusBar.startStatusBar.text = `$(primitive-square)`;
+      StatusBar.startStatusBar.color = 'red';
+    }
+    else {
+      StatusBar.startStatusBar.text = `$(triangle-right)`;
+      StatusBar.startStatusBar.color = 'lightgreen';
+    }
   }
 
-  public updateTimerBar(milliseconds) {
-    StatusBar.timerStatusBar.text = `$(watch) ${this.convertMS(milliseconds)}`
+  public updateTimerBar(milliseconds: number) {
+    StatusBar.timerStatusBar.text = `${this.convertMS(milliseconds)}`
   }
 
-  public updateCurrentTask(name: string) {
-    StatusBar.taskStatusBar.text = name
+  public updateTasksCounter(todayTasks: number = 0) {
+    StatusBar.tasksCounterStatusBar.text = `[${todayTasks}]`
   }
 
-public convertMS(ms): string {
-
-  function pad(number) {
-    return ('00' + number).slice(-2);
+  public updateCurrentTask() {
+    const pomodoro = Pomodoro.getInstance();
+    if (pomodoro.timer && pomodoro.timer.type === TimerType.task){
+      StatusBar.taskStatusBar.text = 'Work';
+      StatusBar.taskStatusBar.tooltip = pomodoro.task.name.replace('☐', '\n☐');
+    }else if (pomodoro.timer && pomodoro.timer.type === TimerType.break){
+      StatusBar.taskStatusBar.text = 'Break';
+    }else if (!pomodoro.timer){
+      StatusBar.taskStatusBar.text = 'Stop';
+    }
   }
-  var mins, secs;
-  secs = Math.floor(ms / 1000);
-  mins = Math.floor(secs / 60);
-  secs = secs % 60;
 
-  return  pad(mins) + ':' + pad(secs);
-};
+  public convertMS(ms): string {
+
+    function pad(number) {
+      return ('00' + number).slice(-2);
+    }
+    var mins, secs;
+    secs = Math.floor(ms / 1000);
+    mins = Math.floor(secs / 60);
+    secs = secs % 60;
+
+    return  pad(mins) + ':' + pad(secs);
+  };
 
   public dispose() {
     StatusBar.timerStatusBar.dispose();

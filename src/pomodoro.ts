@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { Task } from './task';
-import { TimeUnits, Timer } from './timer';
+import { TimeUnits, Timer, TimerType } from './timer';
 import { getConfig } from './config';
 import { YesNoPrompt, InputPrompt, StatusBar } from './ui';
 import { TaskStorage } from './storage';
@@ -8,15 +8,20 @@ import {TextDocument, TextLine, Position, CompletionItem, Range} from 'vscode';
 import {TextEditor, TextEditorEdit} from 'vscode';
 import {TodoDocument} from './TodoDocument'
 
+// State transition
+// Break <=> Task running <=> No task
+// Break timer, Task timer, no timer
+
 export class Pomodoro {
 	private static _instance: Pomodoro;
-	private static _textEditor: TextEditor;
-	private static _edit: TextEditorEdit;
 
 	private _statusBars: StatusBar = StatusBar.getInstance();
 
 	private _storage: TaskStorage;
 
+	public textEditor: TextEditor;
+	public edit: TextEditorEdit;
+	public todayTasksCounter: number = 0;
 	public tasks: Task[];
 	public task: Task;
 	public completedTasksCounter: number;
@@ -24,20 +29,19 @@ export class Pomodoro {
 
 	private breakCounter: number;
 
-	private _timer: Timer;
+	public timer: Timer;
 
-	private constructor(private textEditor: TextEditor, private edit: TextEditorEdit) {
+	private constructor() {
 		this.tasks = [] as Task[];
 		this.completedTasksCounter = 0;
 		this.breakCounter = 0;
 		this._storage = new TaskStorage(getConfig().tasks_file);
 	}
 
-	public static getInstance(textEditor?: TextEditor, edit?: TextEditorEdit): Pomodoro {	
+	public static getInstance(): Pomodoro {	
 		// easton: only todopomo.start command need textEditor	
-		if (Pomodoro._instance === null || Pomodoro._instance === undefined || 
-				Pomodoro._textEditor === null || Pomodoro._textEditor === undefined) {
-			Pomodoro._instance =  new Pomodoro(textEditor, edit);
+		if (Pomodoro._instance === null || Pomodoro._instance === undefined) {
+			Pomodoro._instance =  new Pomodoro();
 		}
 		return Pomodoro._instance;
 	}
@@ -49,18 +53,18 @@ export class Pomodoro {
 		for (let taskIndex in pomodoro.tasks) {			
 			if (pomodoro.tasks[taskIndex].startTime === null) {				
 				break;
-			} else {				
+			}
+			else {				
 				if (pomodoro.tasks[taskIndex].isCompleted) {
 					pomodoro.completedTasksCounter ++;
-				} else {
-					pomodoro.currentTaskIndex = parseInt(taskIndex);
-				}
+				} 
+				// else {
+				// 	pomodoro.currentTaskIndex = parseInt(taskIndex);
+				// }
 			}
 		}
+		this.todayTasksCounter = Task.getTodayTasksCounter();
 		
-		if (pomodoro.currentTaskIndex !== undefined && pomodoro.tasks[pomodoro.currentTaskIndex].startTime !== null) {
-			pomodoro.start();
-		}
 	}
 
 	public async addTask() {
@@ -70,104 +74,104 @@ export class Pomodoro {
 		pomodoro.tasks.push(new Task(newTask, null));
 		pomodoro._storage.save();
 
-		pomodoro._statusBars.updateTasksCounter(pomodoro.completedTasksCounter, pomodoro.tasks.length)
+		pomodoro._statusBars.updateTasksCounter(pomodoro.todayTasksCounter)
 	}
 
+	public openTodoFile(): TextEditor{
+		let textEditor: TextEditor = vscode.window.activeTextEditor;
+		if (!TodoDocument.isSupportedLanguage(textEditor)){
+			let openPath = vscode.Uri.file(getConfig()['todo_file']);
+			vscode.workspace.openTextDocument(openPath).then(doc => {
+				vscode.window.showTextDocument(doc);
+			});
+			return
+		}
+		return textEditor;
+	}
+	// public start(textEditor: TextEditor, edit: TextEditorEdit) {
 	public start() {
 		const pomodoro = Pomodoro.getInstance();
-		let task = new TodoDocument(this.textEditor.document).getTaskPlusProjects(this.textEditor.selection.start);
+		let textEditor = pomodoro.openTodoFile();
+		if (!textEditor) return
+
+		pomodoro.textEditor = textEditor;
+		if (pomodoro.timer && pomodoro.timer.type === TimerType.task){
+			console.log('There is task running, stop previous one first.')
+			return
+		}
+		let task = new TodoDocument(pomodoro.textEditor.document).getTaskPlusProjects(pomodoro.textEditor.selection.start);
 		if (task){
-			pomodoro._statusBars.updateCurrentTask(`Focus: `+task.getTask());
 			pomodoro.task = new Task(task.getTask(), null);
-			pomodoro._timer = pomodoro.task.startTask(()=>{});
+			pomodoro.tasks.push(pomodoro.task);
+			if (pomodoro.timer){
+				pomodoro.stop();
+			}
+			pomodoro.timer = pomodoro.task.startTask(pomodoro.takeBreak);
+			pomodoro.timer.type = TimerType.task;
+			pomodoro._statusBars.updateStartBar();
+			// pomodoro._statusBars.updateTimerBar(task.getTask());
+			pomodoro._statusBars.updateCurrentTask();
 			pomodoro._storage.save();
 		}
 	}
 
-	public pause() {
-		const pomodoro = Pomodoro.getInstance();
-		pomodoro.pickTask();
-		if (pomodoro.currentTaskIndex < pomodoro.tasks.length) {
-			pomodoro._statusBars.updateCurrentTask(`Focus: `+pomodoro.tasks[pomodoro.currentTaskIndex].name)
-		
-			pomodoro._timer = pomodoro.tasks[pomodoro.currentTaskIndex].startTask(pomodoro.askAboutTaskCompletion);
-			pomodoro._storage.save();	
-		} else {
-			return;
-		}
-	}
 	public stop() {
 		const pomodoro = Pomodoro.getInstance();
-		pomodoro.pickTask();
-		if (pomodoro.currentTaskIndex < pomodoro.tasks.length) {
-			pomodoro._statusBars.updateCurrentTask(`Focus: `+pomodoro.tasks[pomodoro.currentTaskIndex].name)
-		
-			pomodoro._timer = pomodoro.tasks[pomodoro.currentTaskIndex].startTask(pomodoro.askAboutTaskCompletion);
-			pomodoro._storage.save();	
-		} else {
-			return;
-		}
+		pomodoro.timer.reset();
+		pomodoro.timer = null;
+		pomodoro._statusBars.updateStartBar();
+		pomodoro._statusBars.updateTimerBar(0);
+		pomodoro._statusBars.updateCurrentTask();
+	}
+
+	public toggle() {
+		const pomodoro = Pomodoro.getInstance();
+		if (pomodoro.timer && pomodoro.timer.type === TimerType.task) pomodoro.stop();
+		else pomodoro.start();
 	}
 
 	public report() {
 		const pomodoro = Pomodoro.getInstance();
-		pomodoro.pickTask();
+		// pomodoro.pickTask();
 		if (pomodoro.currentTaskIndex < pomodoro.tasks.length) {
-			pomodoro._statusBars.updateCurrentTask(`Focus: `+pomodoro.tasks[pomodoro.currentTaskIndex].name)
+			pomodoro._statusBars.updateCurrentTask()
 		
-			pomodoro._timer = pomodoro.tasks[pomodoro.currentTaskIndex].startTask(pomodoro.askAboutTaskCompletion);
+			// pomodoro._timer = pomodoro.tasks[pomodoro.currentTaskIndex].startTask(pomodoro.askAboutTaskCompletion);
 			pomodoro._storage.save();	
 		} else {
 			return;
 		}
 	}
-
-	private pickTask(): void {
-		const pomodoro = Pomodoro.getInstance();
-		if (pomodoro.tasks.length > 0) {
-			if (pomodoro.currentTaskIndex === undefined) {
-				pomodoro.currentTaskIndex = 0;
-			} else {
-				if (pomodoro.tasks[pomodoro.currentTaskIndex].isCompleted) {
-					pomodoro.currentTaskIndex += 1;
-				}
-			}
-		}
+	public CompleteLastTask(){
+		let pomodoro = Pomodoro.getInstance();
+		let lastTask = pomodoro.tasks[pomodoro.tasks.length-1];
+		lastTask.isCompleted = true;
+		pomodoro._storage.save();
+		pomodoro.task = null;
+		pomodoro.todayTasksCounter = Task.getTodayTasksCounter();
+		pomodoro._statusBars.updateTasksCounter(pomodoro.todayTasksCounter);
 	}
 
-	private async askAboutTaskCompletion() {
+	private async askAboutContinueAfterBreak() {
 		const pomodoro = Pomodoro.getInstance();
-		const response: boolean = await YesNoPrompt(`Did you finish the task?`);
-		if(response) {
-			pomodoro.tasks[pomodoro.currentTaskIndex].CompleteTask();
-			pomodoro._statusBars.updateTasksCounter(pomodoro.completedTasksCounter, pomodoro.tasks.length)
-			pomodoro._storage.save();
-		}
-		pomodoro.takeBreak();
+		pomodoro.stop();
+		const response: boolean = await YesNoPrompt(`Continue next task?`);
+		if(response) pomodoro.openTodoFile();
 	}
 
 	private takeBreak(): void {
-		const pomodoro = Pomodoro.getInstance();		
+		const pomodoro = Pomodoro.getInstance();
+		pomodoro.CompleteLastTask();		
 		if (pomodoro.breakCounter < getConfig().counter_to_long_break) {
-			pomodoro._timer = new Timer(getConfig().break_duration, TimeUnits.Milliseconds);
+			pomodoro.timer = new Timer(getConfig().break_duration, TimeUnits.Milliseconds);
 			pomodoro.breakCounter++;
 		} else {
-			pomodoro._timer = new Timer(getConfig().long_break_duration, TimeUnits.Milliseconds);
+			pomodoro.timer = new Timer(getConfig().long_break_duration, TimeUnits.Milliseconds);
 			pomodoro.breakCounter = 0;
 		}
-		pomodoro._statusBars.updateCurrentTask(`Break`);
-		pomodoro._timer.start(pomodoro.start);
-	}
-
-	public clearCompleted(): void {
-		const pomodoro = Pomodoro.getInstance();
-		pomodoro.tasks = pomodoro.tasks.filter(function (task) {
-			return !task.isCompleted;
-		});
-
-		pomodoro.completedTasksCounter = 0;
-		pomodoro.currentTaskIndex = undefined;
-		pomodoro._storage.save();
-		pomodoro._statusBars.updateTasksCounter(pomodoro.completedTasksCounter, pomodoro.tasks.length)
+		pomodoro.timer.type = TimerType.break;
+		pomodoro._statusBars.updateStartBar();
+		pomodoro._statusBars.updateCurrentTask();
+		pomodoro.timer.start(pomodoro.askAboutContinueAfterBreak);
 	}
 }

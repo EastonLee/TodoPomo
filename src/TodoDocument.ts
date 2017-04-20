@@ -1,6 +1,6 @@
 'use strict';
 
-import {TextDocument, TextLine, Position, CompletionItem, Range} from 'vscode';
+import {TextDocument, TextLine, Position, CompletionItem, Range, TextEditor} from 'vscode';
 
 export class TodoDocument {
     
@@ -21,6 +21,9 @@ export class TodoDocument {
     constructor(private _textDocument: TextDocument) {
     }
 
+    public static isSupportedLanguage(textEditor: TextEditor):boolean {
+        return "todo" === textEditor.document.languageId;
+    }
     public getProject(pos: Position): Project {
         let line= this._textDocument.lineAt(pos.line)
         let projectText= line.text.trim();
@@ -35,16 +38,17 @@ export class TodoDocument {
         let parentProjects = [];
         let line_num = line.lineNumber;
         let rev_prev_line_nums = [];
-        for (let i=line_num-1 ; i>=0; i--){
+        for (let i=line_num ; i>=0; i--){
             rev_prev_line_nums.push(i);
         }
+        rev_prev_line_nums.slice(0, 1);
         let lines = rev_prev_line_nums.map(this._textDocument.lineAt);
-        let min_indent = Number.MAX_SAFE_INTEGER;
+        let min_indent = line.firstNonWhitespaceCharacterIndex;
         lines.forEach((l: TextLine)=>{
             let cur_indent = l.firstNonWhitespaceCharacterIndex;
             if (cur_indent < min_indent){
                 min_indent = cur_indent;
-                parentProjects.push(l.text.trim());
+                parentProjects.splice(0,0, l.text.trim());
             }
         });
         console.log(parentProjects);
@@ -64,13 +68,14 @@ export class TodoDocument {
     }
 
     public getTaskPlusProjects(pos: Position): TaskPlusProject {
-        if (!this.isTask(pos)) {
+        if (!this.isTodoTask(pos)) {
+            console.log('this is not a Todo task')
             return null;
         }
 
         let line= this._textDocument.lineAt(pos.line);
         let line_plus_project = this.getParentProject(line.lineNumber);
-        let line_plus_project_str = line_plus_project.join(' ') + line.text.trim().replace('☐', '');
+        let line_plus_project_str = line_plus_project.join(' ') + line.text.trim();
         return new TaskPlusProject(line_plus_project_str);
     }
 
@@ -79,6 +84,10 @@ export class TodoDocument {
         return task.startsWith(TodoDocument.SYMBOL_NEW_TASK) 
                     || task.startsWith(TodoDocument.SYMBOL_CANCEL_TASK)
                     || task.startsWith(TodoDocument.SYMBOL_DONE_TASK);
+    }
+    public isTodoTask(pos: Position): boolean {
+        let task= this._textDocument.lineAt(pos.line).text.trim();
+        return task.startsWith(TodoDocument.SYMBOL_NEW_TASK);
     }
 
     public static toTag(tagName: string): string {

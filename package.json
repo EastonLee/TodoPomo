@@ -23,6 +23,7 @@
         "Other"
     ],
     "activationEvents": [
+        "*",
         "onLanguage:todo",
         "onCommand:todopomo.start",
         "onCommand:todopomo.pause",
