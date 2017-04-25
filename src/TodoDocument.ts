@@ -52,7 +52,6 @@ export class TodoDocument {
                 parentProjects.splice(0,0, l.text.trim());
             }
         });
-        console.log(parentProjects);
         return parentProjects;
     }
 

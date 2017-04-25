@@ -12,7 +12,7 @@ export enum TimeUnits {
   Hour = MINUTES_IN_HOUR * SECONDS_IN_MINUTE * MILLISECONDS_IN_SECOND
 };
 
-export enum TimerType{task, break};
+export enum TimerType{task, break, taskCounterRefresh};
 
 export class Timer {
   public countdownMilliseconds: number;
@@ -26,13 +26,13 @@ export class Timer {
 
   }
 
-  public start (next: Function, soundFile?: string) {
+  public start (next: Function, soundFile?: string, soundVolume?: number) {
     const statusBars = StatusBar.getInstance();
     if (!this.isRunning){
       this.isRunning = true;
       this._timer = setInterval(()=> {
         this.tick();
-        if (soundFile) Sound.play(soundFile);
+        if (soundFile) Sound.play(soundFile, soundVolume);
         statusBars.updateTimerBar(this.countdownMilliseconds);
         if(this.countdownMilliseconds <= 0) {
           this.stop()

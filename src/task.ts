@@ -17,7 +17,7 @@ export class Task {
     this.name = newName;
   }
 
-  public startTask(next: Function, soundFile?: string) : Timer {
+  public startTask(next: Function, soundFile?: string, soundVolume?: number) : Timer {
     let duration = getConfig().task_duration;
     if (this.startTime !== null){ // if the task not already started
       let difference = new Date().getTime() - new Date(this.startTime).getTime();
@@ -27,14 +27,13 @@ export class Task {
     }
 
     let _timer = new Timer(duration, TimeUnits.Milliseconds);
-    _timer.start(next, soundFile);
+    _timer.start(next, soundFile, soundVolume);
     
     return _timer;
   }
   
-  public static getTodayTasksCounter(){
-    const pomodoro = Pomodoro.getInstance();
-    return pomodoro.tasks.filter((t)=>{
+  public static getTodayTasksCounter(tasks: Task[]){
+    return tasks.filter((t)=>{
 		  return t.isCompleted && new Date(t.startTime).toLocaleDateString() === new Date().toLocaleDateString();
 		}).length;
   }

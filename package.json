@@ -15,7 +15,7 @@
     "url": "https://github.com/easton042/TodoPomo"
   },
   "version": "0.0.1",
-  "publisher": "eastonlee",
+  "publisher": "EastonLee",
   "engines": {
     "vscode": "^1.11.0"
   },
@@ -72,10 +72,6 @@
     {
       "command": "todopomo.start",
       "title": "Todopomo: Start Task"
-    },
-    {
-      "command": "todopomo.pause",
-      "title": "Todopomo: Pause Task"
     },
     {
       "command": "todopomo.stop",

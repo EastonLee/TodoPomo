@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import {Pomodoro} from './pomodoro'
-import {TimerType} from './timer'
+import {TimerType, Timer, TimeUnits} from './timer'
 
 export class StatusBar {
   private static _instance: StatusBar;
@@ -29,6 +29,10 @@ export class StatusBar {
     StatusBar.taskStatusBar.show();
     StatusBar.startStatusBar.show();
 
+    setInterval(()=>{
+        this.updateTasksCounter(Pomodoro.getInstance().todayTasksCounter);
+    }, 30000);
+
   }
 
   public static getInstance(): StatusBar {
@@ -40,15 +44,15 @@ export class StatusBar {
 
   public updateStartBar() {
     const pomodoro = Pomodoro.getInstance();
-    console.log(Pomodoro);
-    console.log(pomodoro.timer);
     if (pomodoro.timer && pomodoro.timer.type === TimerType.task) {
       StatusBar.startStatusBar.text = `$(primitive-square)`;
       StatusBar.startStatusBar.color = 'red';
+      StatusBar.startStatusBar.tooltip = 'stop';
     }
     else {
       StatusBar.startStatusBar.text = `$(triangle-right)`;
       StatusBar.startStatusBar.color = 'lightgreen';
+      StatusBar.startStatusBar.tooltip = 'start';
     }
   }
 

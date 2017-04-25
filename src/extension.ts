@@ -6,7 +6,6 @@ import { StatusBar } from './ui';
 export function activate(context: vscode.ExtensionContext) {
 	const pomodoro = Pomodoro.getInstance();
 	const statusBars = StatusBar.getInstance();
-	pomodoro.preload();
 	statusBars.updateTasksCounter(pomodoro.todayTasksCounter);
     let disposable = vscode.commands.registerTextEditorCommand('todopomo.start', pomodoro.start);
     context.subscriptions.push(disposable);

@@ -17,7 +17,8 @@ export interface Config {
     tasks_file: string,
     sound_file: string,
     after_task_sound_file: string,
-    after_break_sound_file: string
+    after_break_sound_file: string,
+    sound_volume: number
 }
 
 export function getConfig(): Config {
@@ -32,8 +33,9 @@ export function getConfig(): Config {
       long_break_duration: configuration.long_break_duration * TimeUnits.Minute || DEFAULT_LONG_BREAK_DURATION,
       counter_to_long_break: configuration.counter_to_long_break || COUNTER_TO_LONG_BREAK, 
       todo_file: configuration.todo_file || path.join(__dirname, `~/.everything.todo`),
-      tasks_file: configuration.task_file || path.join(__dirname, `../../todopomo.json`),
-      sound_file: configuration.sound_file === ""? null : path.join(__dirname, `../../sounds/rain_with_thunder.mp3`),
+      tasks_file: configuration.tasks_file || path.join(__dirname, `../../todopomo.json`),
+      sound_file: configuration.sound_file === ""? null : path.join(__dirname, `../../sounds/rain_with_thunder.wav`),
+      sound_volume: configuration.sound_volume || 100,
       after_task_sound_file: configuration.after_task_sound_file || path.join(__dirname, `../../sounds/alarm.aac`),
       after_break_sound_file: configuration.after_break_sound_file || path.join(__dirname, `../../sounds/alarm.aac`)
     } as Config;

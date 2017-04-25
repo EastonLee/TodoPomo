@@ -10,16 +10,13 @@ export class TaskStorage {
     this.filename = _filename;
   }
 
-  public save(): void {
-    if (this._pomodoro === undefined) {
-      this._pomodoro = Pomodoro.getInstance();
-    }
-    fs.writeFileSync(this.filename, JSON.stringify(this._pomodoro.tasks, null, "\t"));
+  public save(tasks: Task[]): void {
+    fs.writeFileSync(this.filename, JSON.stringify(tasks, null, "\t"));
   }
 
-  public load(): void {
+  public load(pomodoro: Pomodoro): void {
     let tasks: Task[] = [];
-
+    this._pomodoro = pomodoro;
     if (this._pomodoro === undefined) {
       this._pomodoro = Pomodoro.getInstance();
     }

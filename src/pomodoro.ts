@@ -44,12 +44,13 @@ export class Pomodoro {
 		if (Pomodoro._instance === null || Pomodoro._instance === undefined) {
 			Pomodoro._instance = new Pomodoro();
 		}
+		Pomodoro._instance.loadTasks();
 		return Pomodoro._instance;
 	}
 
-	public preload() {
-		const pomodoro = Pomodoro.getInstance();
-		pomodoro._storage.load();
+	public loadTasks() {
+		const pomodoro: Pomodoro = this;
+		pomodoro._storage.load(pomodoro);
 
 		for (let taskIndex in pomodoro.tasks) {
 			if (pomodoro.tasks[taskIndex].startTime === null) {
@@ -61,7 +62,7 @@ export class Pomodoro {
 				}
 			}
 		}
-		this.todayTasksCounter = Task.getTodayTasksCounter();
+		this.todayTasksCounter = Task.getTodayTasksCounter(pomodoro.tasks);
 	}
 
 	public openTodoFile(): TextEditor {
@@ -93,11 +94,14 @@ export class Pomodoro {
 			if (pomodoro.timer) {
 				pomodoro.stop();
 			}
-			pomodoro.timer = pomodoro.task.startTask(pomodoro.takeBreak, getConfig().sound_file);
+			pomodoro.timer = pomodoro.task.startTask(pomodoro.takeBreak, getConfig().sound_file, getConfig().sound_volume);
+			// timing matters: must save after this task has startTime, 
+			// and before updateStartBar refresh pomodoro.tasks
+			pomodoro._storage.save(pomodoro.tasks);
 			pomodoro.timer.type = TimerType.task;
+			pomodoro._statusBars.updateTasksCounter(pomodoro.todayTasksCounter);
 			pomodoro._statusBars.updateStartBar();
 			pomodoro._statusBars.updateCurrentTask();
-			pomodoro._storage.save();
 		}
 	}
 
@@ -122,12 +126,12 @@ export class Pomodoro {
 	}
 
 	public CompleteLastTask() {
-		let pomodoro = Pomodoro.getInstance();
+		const pomodoro = Pomodoro.getInstance();
 		let lastTask = pomodoro.tasks[pomodoro.tasks.length - 1];
 		lastTask.isCompleted = true;
-		pomodoro._storage.save();
+		pomodoro._storage.save(pomodoro.tasks);
 		pomodoro.task = null;
-		pomodoro.todayTasksCounter = Task.getTodayTasksCounter();
+		pomodoro.todayTasksCounter = Task.getTodayTasksCounter(pomodoro.tasks);
 		pomodoro._statusBars.updateTasksCounter(pomodoro.todayTasksCounter);
 	}
 
