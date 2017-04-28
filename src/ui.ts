@@ -30,7 +30,8 @@ export class StatusBar {
     StatusBar.startStatusBar.show();
 
     setInterval(()=>{
-        this.updateTasksCounter(Pomodoro.getInstance().todayTasksCounter);
+      const pomodoro = Pomodoro.getInstance(true);
+      this.updateTasksCounter(pomodoro.todayTasksCounter);
     }, 30000);
 
   }
@@ -43,7 +44,7 @@ export class StatusBar {
   }
 
   public updateStartBar() {
-    const pomodoro = Pomodoro.getInstance();
+    const pomodoro = Pomodoro.getInstance(true);
     if (pomodoro.timer && pomodoro.timer.type === TimerType.task) {
       StatusBar.startStatusBar.text = `$(primitive-square)`;
       StatusBar.startStatusBar.color = 'red';
@@ -65,10 +66,10 @@ export class StatusBar {
   }
 
   public updateCurrentTask() {
-    const pomodoro = Pomodoro.getInstance();
+    const pomodoro = Pomodoro.getInstance(true);
     if (pomodoro.timer && pomodoro.timer.type === TimerType.task){
       StatusBar.taskStatusBar.text = 'Work';
-      StatusBar.taskStatusBar.tooltip = pomodoro.task.name.replace('☐', '\n☐');
+      StatusBar.taskStatusBar.tooltip = pomodoro.task.startTime + '\n' + pomodoro.task.name.replace('☐', '\n☐');
     }else if (pomodoro.timer && pomodoro.timer.type === TimerType.break){
       StatusBar.taskStatusBar.text = 'Break';
     }else if (!pomodoro.timer){
@@ -109,6 +110,7 @@ export async function YesNoPrompt(prompt: string): Promise<boolean> {
     optionYes, optionNo
   );
 
+  if ( !selection ) return Promise.resolve(false);;
   if (selection.title === `Yes`) {
     return Promise.resolve(true);
   }else {

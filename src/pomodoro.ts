@@ -39,12 +39,12 @@ export class Pomodoro {
 		this._storage = new TaskStorage(getConfig().tasks_file);
 	}
 
-	public static getInstance(): Pomodoro {
+	public static getInstance(load: Boolean=false): Pomodoro {
 		// easton: only todopomo.start command need textEditor	
 		if (Pomodoro._instance === null || Pomodoro._instance === undefined) {
 			Pomodoro._instance = new Pomodoro();
 		}
-		Pomodoro._instance.loadTasks();
+		if (load) Pomodoro._instance.loadTasks();
 		return Pomodoro._instance;
 	}
 
@@ -78,7 +78,7 @@ export class Pomodoro {
 	}
 
 	public start() {
-		const pomodoro = Pomodoro.getInstance();
+		const pomodoro = Pomodoro.getInstance(true);
 		let textEditor = pomodoro.openTodoFile();
 		if (!textEditor) return
 
@@ -87,16 +87,22 @@ export class Pomodoro {
 			console.log('There is task running, stop previous one first.')
 			return
 		}
-		let task = new TodoDocument(pomodoro.textEditor.document).getTaskPlusProjects(pomodoro.textEditor.selection.start);
-		if (task) {
-			pomodoro.task = new Task(task.getTask(), null);
+		let doc_task = new TodoDocument(pomodoro.textEditor.document).getTaskPlusProjects(pomodoro.textEditor.selection.start);
+		if (doc_task) {
+			pomodoro.task = new Task(doc_task.getTask(), null);
+			// pomodoro.task = new Task(doc_task.getTask(), new Date().toLocaleString());
+			console.log('old tasks length:', pomodoro.tasks.length);
 			pomodoro.tasks.push(pomodoro.task);
+			console.log('new tasks length:', pomodoro.tasks.length);
 			if (pomodoro.timer) {
-				pomodoro.stop();
+				console.log('timer running,', pomodoro.timer)
+				pomodoro.timer.stop();
 			}
-			pomodoro.timer = pomodoro.task.startTask(pomodoro.takeBreak, getConfig().sound_file, getConfig().sound_volume);
 			// timing matters: must save after this task has startTime, 
 			// and before updateStartBar refresh pomodoro.tasks
+			console.log('new tasks length:', pomodoro.tasks.length);
+			pomodoro.timer = pomodoro.task.startTask(pomodoro.takeBreak, getConfig().sound_file, getConfig().sound_volume);
+			console.log('new tasks length:', pomodoro.tasks.length);
 			pomodoro._storage.save(pomodoro.tasks);
 			pomodoro.timer.type = TimerType.task;
 			pomodoro._statusBars.updateTasksCounter(pomodoro.todayTasksCounter);
@@ -106,7 +112,8 @@ export class Pomodoro {
 	}
 
 	public stop() {
-		const pomodoro = Pomodoro.getInstance();
+		// const pomodoro = Pomodoro.getInstance();
+		const pomodoro = this;
 		pomodoro.timer.reset();
 		pomodoro.timer = null;
 		pomodoro._statusBars.updateStartBar();
@@ -115,18 +122,18 @@ export class Pomodoro {
 	}
 
 	public toggle() {
-		const pomodoro = Pomodoro.getInstance();
+		const pomodoro = Pomodoro.getInstance(true);
 		if (pomodoro.timer && pomodoro.timer.type === TimerType.task) pomodoro.stop();
 		else pomodoro.start();
 	}
 
 	// TODO
 	public report() {
-		const pomodoro = Pomodoro.getInstance();
+		const pomodoro = Pomodoro.getInstance(true);
 	}
 
 	public CompleteLastTask() {
-		const pomodoro = Pomodoro.getInstance();
+		const pomodoro = Pomodoro.getInstance(true);
 		let lastTask = pomodoro.tasks[pomodoro.tasks.length - 1];
 		lastTask.isCompleted = true;
 		pomodoro._storage.save(pomodoro.tasks);
@@ -136,7 +143,7 @@ export class Pomodoro {
 	}
 
 	private async askAboutContinueAfterBreak() {
-		const pomodoro = Pomodoro.getInstance();
+		const pomodoro = Pomodoro.getInstance(true);
 		pomodoro.stop();
 		Sound.play(getConfig().after_break_sound_file);
 		const response: boolean = await YesNoPrompt(`Continue next task?`);
@@ -145,7 +152,7 @@ export class Pomodoro {
 
 	private takeBreak(): void {
 		Sound.play(getConfig().after_task_sound_file);
-		const pomodoro = Pomodoro.getInstance();
+		const pomodoro = Pomodoro.getInstance(true);
 		pomodoro.CompleteLastTask();
 		if (pomodoro.breakCounter < getConfig().counter_to_long_break) {
 			pomodoro.timer = new Timer(getConfig().break_duration, TimeUnits.Milliseconds);

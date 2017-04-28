@@ -4,7 +4,7 @@ import { Pomodoro } from './pomodoro';
 import { StatusBar } from './ui';
 
 export function activate(context: vscode.ExtensionContext) {
-	const pomodoro = Pomodoro.getInstance();
+	const pomodoro = Pomodoro.getInstance(true);
 	const statusBars = StatusBar.getInstance();
 	statusBars.updateTasksCounter(pomodoro.todayTasksCounter);
     let disposable = vscode.commands.registerTextEditorCommand('todopomo.start', pomodoro.start);

@@ -32,32 +32,45 @@
   ],
   "main": "./out/src/extension",
   "contributes": {
-    "type": "object",
-    "title": "TodoPomo Configurations",
-    "properties": {
-      "todopomo.task_duarion": {
-        "type": "number",
-        "default": 25,
-        "description": "The default duration of a TodoPomo Task in minutes"
-      },
-      "todopomo.break_duarion": {
-        "type": "number",
-        "default": 5,
-        "description": "The default duration of a Break in minutes"
-      },
-      "todopomo.long_break_duarion": {
-        "type": "number",
-        "default": 15,
-        "description": "The default duration of a long Break in minutes"
-      },
-      "todopomo.counter_to_long_break": {
-        "type": "number",
-        "default": 3,
-        "description": "number of regular breaks before a long break"
-      },
-      "todopomo.tasks_file": {
-        "type": "string",
-        "description": "full path to the tasks.json file"
+    "configuration": {
+      "type": "object",
+      "title": "TodoPomo Configurations",
+      "properties": {
+        "todopomo.task_duarion": {
+          "type": "number",
+          "default": 25,
+          "description": "the duration of a TodoPomo Task in minutes"
+        },
+        "todopomo.break_duarion": {
+          "type": "number",
+          "default": 5,
+          "description": "the duration of a Break in minutes"
+        },
+        "todopomo.long_break_duarion": {
+          "type": "number",
+          "default": 15,
+          "description": "the duration of a long Break in minutes"
+        },
+        "todopomo.counter_to_long_break": {
+          "type": "number",
+          "default": 3,
+          "description": "number of regular breaks before a long break"
+        },
+        "todopomo.todo_file": {
+          "type": "string",
+          "default": "~/.everything.todo",
+          "description": "full path to the todo task file"
+        },
+        "todopomo.tasks_file": {
+          "type": "string",
+          "default": "~/.todopomo.json",
+          "description": "full path to the tasks.json file"
+        },
+        "todopomo.sound_file": {
+          "type": "string",
+          "default": "sounds/rain_with_thunder.wav",
+          "description": "relative path to the background white noise file, set black to cancel sound"
+        }
       }
     },
     "keybindings": [
@@ -95,5 +108,6 @@
     "play-sound": "^1.1.1",
     "typescript": "^2.0.3",
     "vscode": "^1.0.0"
-  }
+  },
+  "dependencies": {}
 }

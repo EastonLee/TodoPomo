@@ -19,12 +19,7 @@ export class Task {
 
   public startTask(next: Function, soundFile?: string, soundVolume?: number) : Timer {
     let duration = getConfig().task_duration;
-    if (this.startTime !== null){ // if the task not already started
-      let difference = new Date().getTime() - new Date(this.startTime).getTime();
-      duration = getConfig().task_duration - difference;
-    } else {
-      this.startTime = new Date().toLocaleString();
-    }
+    this.startTime = new Date().toLocaleString();
 
     let _timer = new Timer(duration, TimeUnits.Milliseconds);
     _timer.start(next, soundFile, soundVolume);
