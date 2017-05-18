@@ -1,0 +1,36 @@
+✔ make sure "To Do Tasks" extension is installed @done (5/18/2017, 10:16:31 AM)
+☐ press ALT + S to start a Pomodoro task in the current line (clicking the green play button also works)
+☐ watch the Pomodoro number increase by 1 after your timer runs out
+
+Competitive programming:
+  leetcode:
+    ✔ 420. Strong Password Checker @done (5/18/2017, 10:06:21 AM)
+    ✔ 568. Maximum Vacation Days @done (5/18/2017, 10:06:22 AM)
+    ✔ 572. Subtree of Another Tree @done (5/18/2017, 10:06:23 AM)
+    
+vscode plugin:
+  TodoPomo:
+    ☐ report function
+    ☐ publish
+    ☐ archive function
+    ☐ every time archived, sync todo file and tasks file to gist
+
+Courses:
+  Data Science Specialization by Johns Hopkins University: https://www.coursera.org/specializations/jhu-data-science:
+    ✔ Course 1: The Data Scientist’s Toolbox @done (5/12/2017, 11:37:22 PM)
+    ☐ Course 2: R Programming
+    ☐ Course 3: Getting and Cleaning Data
+    ☐ Course 4: Exploratory Data Analysis
+    ☐ Course 5: Reproducible Research
+    ☐ Course 6: Statistical Inference
+    ☐ Course 7: Regression Models
+    ☐ Course 8: Practical Machine Learning
+    ☐ Course 9: Developing Data Products
+    ☐ Course 10: Data Science Capstone
+
+  Data Analysis and Interpretation by Wesleyan University:
+    ☐ COURSE 1 Data Management and Visualization
+    ☐ COURSE 2 Data Analysis Tools
+    ☐ COURSE 3 Regression Modeling in Practice
+    ☐ COURSE 4 Machine Learning for Data Analysis
+    ☐ COURSE 5 Data Analysis and Interpretation Capstone

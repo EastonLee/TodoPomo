@@ -6,8 +6,9 @@ import { YesNoPrompt, InputPrompt, StatusBar } from './ui';
 import { TaskStorage } from './storage';
 import { TextDocument, TextLine, Position, CompletionItem, Range } from 'vscode';
 import { TextEditor, TextEditorEdit } from 'vscode';
-import { TodoDocument } from './TodoDocument'
-import { Sound } from './sounds'
+import { TodoDocument } from './TodoDocument';
+import { Sound } from './sounds';
+import fs = require('fs');
 
 // State transition
 // Break <=> Task running <=> No task
@@ -68,6 +69,9 @@ export class Pomodoro {
 	public openTodoFile(): TextEditor {
 		let textEditor: TextEditor = vscode.window.activeTextEditor;
 		if (!TodoDocument.isSupportedLanguage(textEditor)) {
+			if (!fs.existsSync(getConfig()['todo_file'])) {
+				fs.closeSync(fs.openSync(getConfig()['todo_file'], 'w'));
+			}
 			let openPath = vscode.Uri.file(getConfig()['todo_file']);
 			vscode.workspace.openTextDocument(openPath).then(doc => {
 				vscode.window.showTextDocument(doc);

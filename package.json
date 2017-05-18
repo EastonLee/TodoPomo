@@ -58,13 +58,13 @@
         },
         "todopomo.todo_file": {
           "type": "string",
-          "default": "~/.everything.todo",
-          "description": "full path to the todo task file"
+          "default": "",
+          "description": "full path to the todo task file, default is ~/.everything.todo"
         },
         "todopomo.tasks_file": {
           "type": "string",
-          "default": "~/.todopomo.json",
-          "description": "full path to the tasks.json file"
+          "default": "",
+          "description": "full path to the tasks.json file, default is ~/.todopomo.json"
         },
         "todopomo.sound_file": {
           "type": "string",

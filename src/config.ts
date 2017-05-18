@@ -26,14 +26,14 @@ export function getConfig(): Config {
     try {
         configuration = workspace.getConfiguration('todopomo');
     } catch (error) {}    
-    
+    let home_path = (process.platform === 'win32') ? process.env.HOMEPATH : process.env.HOME
     return {
       task_duration: configuration.task_duration * TimeUnits.Minute || DEFAULT_TASK_DURATION,
       break_duration: configuration.break_duration * TimeUnits.Minute || DEFAULT_BREAK_DURATION,
       long_break_duration: configuration.long_break_duration * TimeUnits.Minute || DEFAULT_LONG_BREAK_DURATION,
       counter_to_long_break: configuration.counter_to_long_break || COUNTER_TO_LONG_BREAK, 
-      todo_file: configuration.todo_file || path.join(__dirname, `~/.everything.todo`),
-      tasks_file: configuration.tasks_file || path.join(__dirname, `../../todopomo.json`),
+      todo_file: configuration.todo_file || path.join(home_path, `.everything.todo`),
+      tasks_file: configuration.tasks_file || path.join(home_path, `.todopomo.json`),
       sound_file: configuration.sound_file === ""? null : path.join(__dirname, '..', '..', configuration.sound_file),
       sound_volume: configuration.sound_volume || 100,
       after_task_sound_file: configuration.after_task_sound_file || path.join(__dirname, `../../sounds/alarm.aac`),

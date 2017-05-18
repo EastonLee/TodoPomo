@@ -22,9 +22,9 @@ export class TaskStorage {
     }
 
     if (!fs.existsSync(this.filename)) {
-      this._pomodoro.tasks = tasks
+      fs.closeSync(fs.openSync(this.filename, 'w'));
+      fs.writeFileSync(this.filename, '[]');
     }
-
     try {
       let items = JSON.parse(fs.readFileSync(this.filename).toString());
       tasks = items.map(t => {
