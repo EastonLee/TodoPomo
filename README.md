@@ -8,7 +8,7 @@ When editing "To Do Tasks" file, you can start a Pomodoro with a task name by pl
 
 TodoPomo provides you background white noise when working, you can change it or disable it.
 
-Todopomo allows you to specify the task file where you organize and store your plans, the default task file location is "~/.everything.todo". Your finished tasks are stored in the "~/.todopomo.json".
+Todopomo allows you to specify the task file where you organize and store your plans, the default task file location is "\~/.everything.todo". Your finished tasks are stored in the "\~/.todopomo.json".
 
 The number on the right hand of the counting down clock indicates how many Pomodoro you have finished today, helps track your daily work load.
 
