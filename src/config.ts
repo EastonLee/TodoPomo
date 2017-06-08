@@ -18,7 +18,8 @@ export interface Config {
     sound_file: string,
     after_task_sound_file: string,
     after_break_sound_file: string,
-    sound_volume: number
+    sound_volume: number,
+    reminder: boolean
 }
 
 export function getConfig(): Config {
@@ -37,6 +38,7 @@ export function getConfig(): Config {
       sound_file: configuration.sound_file === ""? null : path.join(__dirname, '..', '..', configuration.sound_file),
       sound_volume: configuration.sound_volume || 100,
       after_task_sound_file: configuration.after_task_sound_file || path.join(__dirname, `../../sounds/alarm.aac`),
-      after_break_sound_file: configuration.after_break_sound_file || path.join(__dirname, `../../sounds/alarm.aac`)
+      after_break_sound_file: configuration.after_break_sound_file || path.join(__dirname, `../../sounds/alarm.aac`),
+      reminder: configuration.reminder
     } as Config;
 }

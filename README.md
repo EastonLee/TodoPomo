@@ -4,13 +4,20 @@ TodoPomo is a Visual Studio Code extension that combines To Do Task and Pomodoro
 
 ![TodoPomo](images/TodoPomo.gif)
 
-When editting "To Do Tasks" file, you can start a Pomodoro with a task name by placing cursor in the task line and pressing ALT + S shortcut or clicking the green play button at the bottom right corner.
+When editing "To Do Tasks" file, you can start a Pomodoro with a task name by placing cursor in the task line and pressing ALT + S shortcut or clicking the green play button at the bottom right corner.
 
 TodoPomo provides you background white noise when working, you can change it or disable it.
 
-Todopomo allows you to specify the task file where you organize and store your plans, the default task file location is "~/.everything.todo". You finished tasks are stored in the "~/.todopomo.json".
+Todopomo allows you to specify the task file where you organize and store your plans, the default task file location is "~/.everything.todo". Your finished tasks are stored in the "~/.todopomo.json".
 
 The number on the right hand of the counting down clock indicates how many Pomodoro you have finished today, helps track your daily work load.
+
+## How to install
+
+1. Open Visual Studio Code
+1. Run `ext install TodoPomo` in Command Palette (without ">" prompt)
+
+Or search and install "TodoPomo" install extension panel.
 
 ## Requirements
 
@@ -24,9 +31,14 @@ This extension contributes the following settings:
 * `todopomo.break_duarion`: the duration of a Break in minutes, the default is 5
 * `todopomo.long_break_duarion`: the duration of a long Break in minutes, the default is 15
 * `todopomo.counter_to_long_break`: number of regular breaks before a long break, the default is 3
-* `todopomo.todo_file`: full path to the todo task file, when left blank, the default setting ~/.everything.todo is picked.
+* `todopomo.todo_file`: full path to the todo task file, when left blank, the default setting ~/.everything.todo is picked
 * `todopomo.tasks_file`: full path to the tasks.json file, when left blank, the default setting ~/.todopomo.json is picked
 * `todopomo.sound_file`: relative path to the background white noise file, set black to cancel sound, the default is "sounds/rain_with_thunder.wav"
+* `todopomo.reminder`: if enable a popup to remind you of continuing next task
+
+## Source Code
+
+Fork, Issue, PR are all welcome on [GitHub](https://github.com/easton042/TodoPomo).
 
 ## Credits
 

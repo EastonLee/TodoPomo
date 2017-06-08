@@ -150,8 +150,10 @@ export class Pomodoro {
 		const pomodoro = Pomodoro.getInstance(true);
 		pomodoro.stop();
 		Sound.play(getConfig().after_break_sound_file);
-		const response: boolean = await YesNoPrompt(`Continue next task?`);
-		if (response) pomodoro.openTodoFile();
+		if (getConfig().reminder) {
+			const response: boolean = await YesNoPrompt(`Continue next task?`);
+			if (response) pomodoro.openTodoFile();
+		}
 	}
 
 	private takeBreak(): void {
