@@ -14,7 +14,7 @@
     "type": "git",
     "url": "https://github.com/easton042/TodoPomo"
   },
-  "version": "0.0.1",
+  "version": "0.2.0",
   "publisher": "EastonLee",
   "engines": {
     "vscode": "^1.11.0"
