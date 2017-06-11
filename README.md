@@ -40,6 +40,8 @@ This extension contributes the following settings:
 
 Fork, Issue, PR are all welcome on [GitHub](https://github.com/easton042/TodoPomo).
 
+You can also comment this extension [here](https://eastonlee.com/blog/2017/06/01/todopomo/)
+
 ## Credits
 
 Credit for vscode-pomodoro code goes to [Ygilany](https://github.com/Ygilany/vscode-pomodoro)
