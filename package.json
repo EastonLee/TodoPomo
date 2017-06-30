@@ -8,11 +8,11 @@
         "email": "me@eastonlee.com"
     },
     "bugs": {
-        "url": "https://github.com/easton042/TodoPomo/issues"
+        "url": "https://github.com/eastonlee/TodoPomo/issues"
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/easton042/TodoPomo"
+        "url": "https://github.com/eastonlee/TodoPomo"
     },
     "version": "0.2.2",
     "publisher": "EastonLee",
@@ -68,7 +68,7 @@
                 },
                 "todopomo.sound_file": {
                     "type": "string",
-                    "default": "sounds/rain_with_thunder.wav",
+                    "default": "sounds/rain_with_thunder_mid.wav",
                     "description": "relative path to the background white noise file, set black to cancel sound"
                 },
                 "todopomo.reminder": {
