@@ -4,7 +4,7 @@ TodoPomo is a Visual Studio Code extension that combines To Do Task and Pomodoro
 
 ![TodoPomo](images/TodoPomo.gif)
 
-When editing "To Do Tasks" file, you can start a Pomodoro with a task name by placing cursor in the task line and pressing ALT + S shortcut or clicking the green play button at the bottom right corner.
+When editing "To Do Tasks" file, you can start a Pomodoro with a task name by placing cursor in the task line and pressing SHIFT + ALT + S shortcut or clicking the green play button at the bottom right corner.
 
 TodoPomo provides you background white noise when working, you can change it or disable it.
 
